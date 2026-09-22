@@ -101,11 +101,15 @@ export function deriveObservations(
       );
     }
 
-    if (attnForm.manipulation.kind === "attention") {
+    const attentionManipulation =
+      attnForm.manipulation.kind === "attention"
+        ? attnForm.manipulation
+        : null;
+    if (attentionManipulation) {
       const distractorSelections = selectionTraces.filter(
         (trace) =>
           trace.payload.signalId ===
-            attnForm.manipulation.salientDistractorId &&
+            attentionManipulation.salientDistractorId &&
           trace.payload.selected === true,
       );
       observations.push(
