@@ -13,13 +13,15 @@ describe("assessment session", () => {
 
     expect(session.version).toBe(ASSESSMENT_SESSION_VERSION);
     expect(session.status).toBe("not_started");
+    expect(session.assessmentLanguage).toBeNull();
     expect(session.currentTaskIndex).toBe(0);
     expect(session.responses).toEqual([]);
     expect(session.draftAnswer).toBeNull();
   });
 
-  it("preserves existing progress when a stored session is resumed", () => {
-    const progressed = updateSession(createInitialSession(), {
+  it("locks and preserves the assessment language when resumed", () => {
+    const started = startSession(createInitialSession(), "tr");
+    const progressed = updateSession(started, {
       currentTaskIndex: 3,
       confidence: 75,
       draftAnswer: "example",
@@ -27,8 +29,9 @@ describe("assessment session", () => {
       taskStartedAt: "2026-09-22T10:04:00.000Z",
     });
 
-    const resumed = startSession(progressed);
+    const resumed = startSession(progressed, "en");
 
+    expect(resumed.assessmentLanguage).toBe("tr");
     expect(resumed.currentTaskIndex).toBe(3);
     expect(resumed.confidence).toBe(75);
     expect(resumed.draftAnswer).toBe("example");

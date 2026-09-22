@@ -1,3 +1,5 @@
+import type { Locale } from "../i18n/config";
+
 export const cognitiveDimensions = [
   "reasoning",
   "adaptiveLearning",
@@ -109,8 +111,9 @@ export type DimensionScores = Record<CognitiveDimension, number>;
 export type AdaptivePhase = "phase-a" | "transition" | "phase-b";
 
 export type AssessmentSession = {
-  version: 3;
+  version: 4;
   status: "not_started" | "in_progress" | "completed";
+  assessmentLanguage: Locale | null;
   currentTaskIndex: number;
   confidence: Confidence;
   draftAnswer: AssessmentDraftAnswer;

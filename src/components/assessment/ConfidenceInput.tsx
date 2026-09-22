@@ -1,19 +1,23 @@
 import type { Confidence } from "../../assessment/types";
+import { interpolate } from "../../i18n/messages";
+import type { UiMessages } from "../../i18n/types";
 
 type ConfidenceInputProps = {
   value: Confidence;
   onChange: (value: Confidence) => void;
+  ui: UiMessages["assessment"];
 };
 
 export function ConfidenceInput({
   value,
   onChange,
+  ui,
 }: ConfidenceInputProps) {
   return (
     <div className="mt-8 border-t border-[var(--color-border)] pt-6">
       <div className="flex items-center justify-between gap-6">
         <label className="text-sm font-medium" htmlFor="assessment-confidence">
-          Confidence
+          {ui.confidence}
         </label>
         <output
           className="text-xs tabular-nums text-[var(--color-muted)]"
@@ -31,7 +35,7 @@ export function ConfidenceInput({
         max={100}
         step={5}
         value={value}
-        aria-valuetext={`${value} percent confident`}
+        aria-valuetext={interpolate(ui.confidenceAriaValue, { value })}
         onChange={(event) => onChange(Number(event.currentTarget.value))}
       />
 
@@ -39,8 +43,8 @@ export function ConfidenceInput({
         className="mt-1.5 flex justify-between text-[10px] uppercase tracking-[0.08em] text-[var(--color-muted-soft)]"
         aria-hidden="true"
       >
-        <span>Low</span>
-        <span>High</span>
+        <span>{ui.low}</span>
+        <span>{ui.high}</span>
       </div>
     </div>
   );

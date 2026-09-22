@@ -1,53 +1,60 @@
+import type { CognitiveDimension } from "../assessment/types";
+import { LanguageSelector } from "../components/ui/LanguageSelector";
 import { Button } from "../components/ui/Button";
+import { useLocale } from "../i18n/LocaleProvider";
 
-const dimensions = [
-  { index: "01", label: "Reasoning" },
-  { index: "02", label: "Adaptive learning" },
-  { index: "03", label: "Evidence evaluation" },
-  { index: "04", label: "Information filtering" },
-  { index: "05", label: "Metacognitive calibration" },
-  { index: "06", label: "Knowledge transfer" },
-] as const;
+const dimensionOrder: CognitiveDimension[] = [
+  "reasoning",
+  "adaptiveLearning",
+  "evidenceEvaluation",
+  "informationFiltering",
+  "metacognitiveCalibration",
+  "knowledgeTransfer",
+];
 
 type LandingPageProps = {
   onBegin: () => void;
 };
 
 export function LandingPage({ onBegin }: LandingPageProps) {
+  const { messages } = useLocale();
+
   return (
     <main className="overflow-hidden">
-      <header className="mx-auto flex w-full max-w-[1180px] items-center justify-between px-5 py-6 sm:px-8 sm:py-7">
+      <header className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-4 px-5 py-6 sm:px-8 sm:py-7">
         <a
-          className="text-[12px] font-semibold tracking-[0.24em] text-[var(--color-foreground)]"
+          className="shrink-0 text-[12px] font-semibold tracking-[0.24em] text-[var(--color-foreground)]"
           href="/"
-          aria-label="MINDPRINT home"
+          aria-label={messages.accessibility.homeLabel}
         >
           MINDPRINT
         </a>
 
-        <span className="text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)]">
-          Experimental assessment
-        </span>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="hidden text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)] sm:inline">
+            {messages.landing.experimentalAssessment}
+          </span>
+          <LanguageSelector compact />
+        </div>
       </header>
 
       <section className="mx-auto grid w-full max-w-[1180px] items-center gap-12 px-5 pb-24 pt-20 sm:px-8 sm:pb-28 sm:pt-24 lg:min-h-[690px] lg:grid-cols-[minmax(0,1.16fr)_minmax(340px,0.84fr)] lg:gap-16 lg:pb-28 lg:pt-20">
         <div className="max-w-[720px]">
           <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.19em] text-[var(--color-accent)]">
-            Cognitive assessment
+            {messages.landing.cognitiveAssessment}
           </p>
 
-          <h1 className="text-balance text-[clamp(3.15rem,6.4vw,6.25rem)] font-semibold leading-[0.94] tracking-[-0.06em]">
-            How do you think when the answer isn&apos;t obvious?
+          <h1 className="text-balance text-[clamp(3rem,6.4vw,6.25rem)] font-semibold leading-[0.96] tracking-[-0.06em]">
+            {messages.landing.headline}
           </h1>
 
-          <p className="mt-7 max-w-[560px] text-pretty text-[16px] leading-7 text-[var(--color-muted)] sm:text-[17px]">
-            MINDPRINT examines reasoning, adaptation, evidence judgment, and
-            confidence through a short modern assessment.
+          <p className="mt-7 max-w-[590px] text-pretty text-[16px] leading-7 text-[var(--color-muted)] sm:text-[17px]">
+            {messages.landing.support}
           </p>
 
           <div className="mt-9">
             <Button className="min-w-[164px]" onClick={onBegin}>
-              Begin assessment
+              {messages.landing.beginAssessment}
             </Button>
           </div>
         </div>
@@ -73,27 +80,27 @@ export function LandingPage({ onBegin }: LandingPageProps) {
           <div className="grid gap-8 lg:grid-cols-[0.32fr_0.68fr] lg:gap-16">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)]">
-                Scope
+                {messages.landing.scope}
               </p>
               <h2
                 id="measures-heading"
                 className="mt-3 text-[26px] font-semibold tracking-[-0.04em]"
               >
-                What it measures
+                {messages.landing.whatItMeasures}
               </h2>
             </div>
 
             <div className="grid border-t border-[var(--color-border)] sm:grid-cols-2">
-              {dimensions.map((dimension) => (
+              {dimensionOrder.map((dimension, index) => (
                 <div
-                  key={dimension.label}
+                  key={dimension}
                   className="flex min-h-[72px] items-center gap-5 border-b border-[var(--color-border)] py-4 sm:pr-6 sm:odd:pr-8 sm:even:pl-8"
                 >
                   <span className="text-[10px] font-medium tabular-nums tracking-[0.14em] text-[var(--color-muted-soft)]">
-                    {dimension.index}
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                   <p className="text-sm font-medium tracking-[-0.01em]">
-                    {dimension.label}
+                    {messages.dimensions[dimension]}
                   </p>
                 </div>
               ))}
@@ -109,29 +116,28 @@ export function LandingPage({ onBegin }: LandingPageProps) {
       >
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)]">
-            Approach
+            {messages.landing.approach}
           </p>
           <h2
             id="method-heading"
             className="mt-3 text-[26px] font-semibold tracking-[-0.04em]"
           >
-            Method
+            {messages.landing.method}
           </h2>
         </div>
 
-        <p className="max-w-[640px] text-pretty text-[17px] leading-8 tracking-[-0.012em] text-[var(--color-foreground-soft)] sm:text-[18px]">
-          Short tasks introduce incomplete information, changing rules,
-          conflicting evidence, and confidence judgments. Performance is
-          summarized within the assessment itself.
+        <p className="max-w-[660px] text-pretty text-[17px] leading-8 tracking-[-0.012em] text-[var(--color-foreground-soft)] sm:text-[18px]">
+          {messages.landing.methodBody}
         </p>
       </section>
 
       <section className="border-t border-[var(--color-border)]">
         <div className="mx-auto grid w-full max-w-[1180px] gap-4 px-5 py-9 sm:px-8 md:grid-cols-[0.32fr_0.68fr] md:gap-16">
-          <p className="text-sm font-medium">Experimental by design.</p>
-          <p className="max-w-[640px] text-sm leading-6 text-[var(--color-muted)]">
-            Not an IQ test, clinical instrument, diagnostic tool, or population
-            percentile assessment.
+          <p className="text-sm font-medium">
+            {messages.landing.experimentalByDesign}
+          </p>
+          <p className="max-w-[660px] text-sm leading-6 text-[var(--color-muted)]">
+            {messages.landing.disclaimer}
           </p>
         </div>
       </section>
@@ -139,7 +145,7 @@ export function LandingPage({ onBegin }: LandingPageProps) {
       <footer className="border-t border-[var(--color-border)]">
         <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-5 py-6 text-[10px] uppercase tracking-[0.15em] text-[var(--color-muted)] sm:px-8">
           <span>MINDPRINT</span>
-          <span>V0.1</span>
+          <span>{messages.landing.version}</span>
         </div>
       </footer>
     </main>

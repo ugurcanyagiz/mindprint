@@ -1,4 +1,5 @@
 import type { MultiSelectTask } from "../../assessment/types";
+import type { UiMessages } from "../../i18n/types";
 import { Button } from "../ui/Button";
 import { ConfidenceInput } from "./ConfidenceInput";
 import { TaskFrame } from "./TaskFrame";
@@ -10,6 +11,7 @@ type MetricSelectionTaskViewProps = {
   onAnswerChange: (value: string[]) => void;
   onConfidenceChange: (value: number) => void;
   onSubmit: () => void;
+  ui: UiMessages["assessment"];
 };
 
 export function MetricSelectionTaskView({
@@ -19,6 +21,7 @@ export function MetricSelectionTaskView({
   onAnswerChange,
   onConfidenceChange,
   onSubmit,
+  ui,
 }: MetricSelectionTaskViewProps) {
   const toggleMetric = (id: string) => {
     if (answer.includes(id)) {
@@ -55,7 +58,7 @@ export function MetricSelectionTaskView({
             <button
               key={metric.id}
               className={[
-                "grid min-h-[56px] w-full grid-cols-[1fr_auto] items-center gap-6 border-b border-[var(--color-border)] px-1 py-3 text-left last:border-b-0",
+                "grid min-h-[56px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-[var(--color-border)] px-1 py-3 text-left last:border-b-0 sm:gap-6",
                 "transition-[background-color,opacity] duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-focus)]",
                 selected ? "bg-white/70" : "hover:bg-white/45",
@@ -66,10 +69,10 @@ export function MetricSelectionTaskView({
               disabled={disabled}
               onClick={() => toggleMetric(metric.id)}
             >
-              <span className="flex items-center gap-3 text-sm font-medium">
+              <span className="flex min-w-0 items-center gap-3 text-sm font-medium">
                 <span
                   className={[
-                    "grid h-4 w-4 place-items-center rounded-[4px] border",
+                    "grid h-4 w-4 shrink-0 place-items-center rounded-[4px] border",
                     selected
                       ? "border-[var(--color-accent)] bg-[var(--color-accent)]"
                       : "border-[var(--color-border-strong)] bg-white",
@@ -80,7 +83,7 @@ export function MetricSelectionTaskView({
                     <span className="h-1.5 w-1.5 rounded-[1px] bg-white" />
                   ) : null}
                 </span>
-                {metric.label}
+                <span>{metric.label}</span>
               </span>
               <span className="text-sm tabular-nums text-[var(--color-muted)]">
                 {metric.value}
@@ -90,14 +93,18 @@ export function MetricSelectionTaskView({
         })}
       </div>
 
-      <ConfidenceInput value={confidence} onChange={onConfidenceChange} />
+      <ConfidenceInput
+        value={confidence}
+        onChange={onConfidenceChange}
+        ui={ui}
+      />
 
       <div className="mt-8 flex justify-end">
         <Button
           disabled={answer.length !== task.selectionLimit}
           onClick={onSubmit}
         >
-          Continue
+          {ui.continue}
         </Button>
       </div>
     </TaskFrame>

@@ -1,0 +1,78 @@
+import type { CognitiveDimension } from "../assessment/types";
+
+export type UiMessages = {
+  accessibility: {
+    homeLabel: string;
+    languageLabel: string;
+  };
+  dimensions: Record<CognitiveDimension, string>;
+  landing: {
+    experimentalAssessment: string;
+    cognitiveAssessment: string;
+    headline: string;
+    support: string;
+    beginAssessment: string;
+    scope: string;
+    whatItMeasures: string;
+    approach: string;
+    method: string;
+    methodBody: string;
+    experimentalByDesign: string;
+    disclaimer: string;
+    version: string;
+  };
+  assessment: {
+    label: string;
+    introTitle: string;
+    introBody: string;
+    duration: string;
+    durationValue: string;
+    tasks: string;
+    startAssessment: string;
+    exit: string;
+    continue: string;
+    confidence: string;
+    low: string;
+    high: string;
+    confidenceAriaValue: string;
+    selectOneResponse: string;
+    progressLabel: string;
+    ruleUpdate: string;
+    principle: string;
+    automatedAnalysis: string;
+    claim: string;
+    rankingInstructions: string;
+    moveUp: string;
+    moveDown: string;
+    moveUpLabel: string;
+    moveDownLabel: string;
+  };
+  results: {
+    headerLabel: string;
+    assessmentComplete: string;
+    title: string;
+    subtitle: string;
+    averageConfidence: string;
+    responseAccuracy: string;
+    calibrationGap: string;
+    points: string;
+    observedStrengths: string;
+    confidenceCalibration: string;
+    assessmentNote: string;
+    retakeAssessment: string;
+    copySummary: string;
+    copied: string;
+    preparing: string;
+    processingPerformance: string;
+    processingCalibration: string;
+    processingScores: string;
+    methodNote: string;
+    strengthEven: string;
+    strengthComparative: string;
+    calibrationClose: string;
+    calibrationSomeDistance: string;
+    calibrationNoticeable: string;
+    assessmentNoteBody: string;
+    summaryTitle: string;
+  };
+};

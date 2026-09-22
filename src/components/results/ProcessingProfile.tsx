@@ -1,11 +1,15 @@
 import { useEffect } from "react";
 
+import type { UiMessages } from "../../i18n/types";
+
 type ProcessingProfileProps = {
   onComplete: () => void;
+  messages: UiMessages["results"];
 };
 
 export function ProcessingProfile({
   onComplete,
+  messages,
 }: ProcessingProfileProps) {
   useEffect(() => {
     const timeout = window.setTimeout(onComplete, 950);
@@ -23,13 +27,13 @@ export function ProcessingProfile({
             MINDPRINT
           </p>
           <h1 className="mt-4 text-balance text-[36px] font-semibold leading-[1.05] tracking-[-0.05em] sm:text-[46px]">
-            Preparing your cognitive profile
+            {messages.preparing}
           </h1>
 
           <div className="mt-9 border-t border-[var(--color-border)] pt-5 text-[13px] leading-6 text-[var(--color-muted)]">
-            <p>Summarizing task performance</p>
-            <p>Comparing confidence with observed accuracy</p>
-            <p>Preparing dimension scores</p>
+            <p>{messages.processingPerformance}</p>
+            <p>{messages.processingCalibration}</p>
+            <p>{messages.processingScores}</p>
           </div>
         </div>
       </section>

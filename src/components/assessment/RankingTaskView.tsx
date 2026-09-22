@@ -1,4 +1,6 @@
 import type { RankingTask } from "../../assessment/types";
+import { interpolate } from "../../i18n/messages";
+import type { UiMessages } from "../../i18n/types";
 import { Button } from "../ui/Button";
 import { ConfidenceInput } from "./ConfidenceInput";
 import { TaskFrame } from "./TaskFrame";
@@ -10,6 +12,7 @@ type RankingTaskViewProps = {
   onAnswerChange: (value: string[]) => void;
   onConfidenceChange: (value: number) => void;
   onSubmit: (value: string[]) => void;
+  ui: UiMessages["assessment"];
 };
 
 export function moveRankedItem(
@@ -35,6 +38,7 @@ export function RankingTaskView({
   onAnswerChange,
   onConfidenceChange,
   onSubmit,
+  ui,
 }: RankingTaskViewProps) {
   const initialOrder = task.items.map((item) => item.id);
   const order = answer ?? initialOrder;
@@ -48,7 +52,7 @@ export function RankingTaskView({
     <TaskFrame eyebrow={task.eyebrow} title={task.title}>
       <div className="border-l border-[var(--color-accent)] pl-4">
         <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)]">
-          Claim
+          {ui.claim}
         </p>
         <p className="mt-2 text-[15px] leading-6 text-[var(--color-foreground-soft)]">
           {task.claim}
@@ -86,24 +90,26 @@ export function RankingTaskView({
                 </p>
               </div>
 
-              <div className="col-start-2 flex items-center gap-0.5 sm:col-start-auto">
+              <div className="col-start-2 flex flex-wrap items-center gap-0.5 sm:col-start-auto">
                 <button
                   className="min-h-9 rounded-md px-2.5 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === 0}
-                  aria-label={`Move ${item.label} up`}
+                  aria-label={interpolate(ui.moveUpLabel, { item: item.label })}
                   onClick={() => reorder(index, -1)}
                 >
-                  Up
+                  {ui.moveUp}
                 </button>
                 <button
                   className="min-h-9 rounded-md px-2.5 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === order.length - 1}
-                  aria-label={`Move ${item.label} down`}
+                  aria-label={interpolate(ui.moveDownLabel, {
+                    item: item.label,
+                  })}
                   onClick={() => reorder(index, 1)}
                 >
-                  Down
+                  {ui.moveDown}
                 </button>
               </div>
             </li>
@@ -115,13 +121,17 @@ export function RankingTaskView({
         id="ranking-instructions"
         className="mt-2.5 text-[11px] text-[var(--color-muted)]"
       >
-        1 = most influential. Use Up and Down to reorder.
+        {ui.rankingInstructions}
       </p>
 
-      <ConfidenceInput value={confidence} onChange={onConfidenceChange} />
+      <ConfidenceInput
+        value={confidence}
+        onChange={onConfidenceChange}
+        ui={ui}
+      />
 
       <div className="mt-8 flex justify-end">
-        <Button onClick={() => onSubmit(order)}>Continue</Button>
+        <Button onClick={() => onSubmit(order)}>{ui.continue}</Button>
       </div>
     </TaskFrame>
   );

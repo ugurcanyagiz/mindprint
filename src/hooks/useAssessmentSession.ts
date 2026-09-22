@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import type { Locale } from "../i18n/config";
 import {
   ASSESSMENT_SESSION_KEY,
   ASSESSMENT_SESSION_VERSION,
@@ -36,8 +37,8 @@ export function useAssessmentSession(totalTasks: number) {
     writeLocalValue(ASSESSMENT_SESSION_KEY, session);
   }, [session]);
 
-  const begin = () => {
-    setSession((current) => startSession(current));
+  const begin = (locale: Locale) => {
+    setSession((current) => startSession(current, locale));
   };
 
   const setConfidence = (confidence: Confidence) => {

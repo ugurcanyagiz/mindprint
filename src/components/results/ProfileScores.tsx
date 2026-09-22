@@ -1,7 +1,4 @@
-import {
-  dimensionLabels,
-  type CognitiveProfile,
-} from "../../assessment/profile";
+import type { CognitiveProfile } from "../../assessment/profile";
 import type { CognitiveDimension } from "../../assessment/types";
 
 const dimensionOrder: CognitiveDimension[] = [
@@ -15,9 +12,13 @@ const dimensionOrder: CognitiveDimension[] = [
 
 type ProfileScoresProps = {
   profile: CognitiveProfile;
+  labels: Record<CognitiveDimension, string>;
 };
 
-export function ProfileScores({ profile }: ProfileScoresProps) {
+export function ProfileScores({
+  profile,
+  labels,
+}: ProfileScoresProps) {
   return (
     <div className="border-t border-[var(--color-border)]">
       {dimensionOrder.map((dimension) => {
@@ -30,7 +31,7 @@ export function ProfileScores({ profile }: ProfileScoresProps) {
           >
             <div className="flex items-center justify-between gap-4 sm:block">
               <span className="text-sm font-medium">
-                {dimensionLabels[dimension]}
+                {labels[dimension]}
               </span>
               <span className="text-xs tabular-nums text-[var(--color-muted)] sm:hidden">
                 {score}
@@ -40,7 +41,7 @@ export function ProfileScores({ profile }: ProfileScoresProps) {
             <div
               className="h-[5px] overflow-hidden rounded-full bg-[var(--color-track)]"
               role="meter"
-              aria-label={dimensionLabels[dimension]}
+              aria-label={labels[dimension]}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={score}

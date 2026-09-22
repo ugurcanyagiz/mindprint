@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import type { AdaptivePhase, AdaptiveRuleTask } from "../../assessment/types";
+import type { UiMessages } from "../../i18n/types";
 import { Button } from "../ui/Button";
 import { RulePanel } from "./RulePanel";
 import { TaskFrame } from "./TaskFrame";
@@ -13,6 +14,7 @@ type AdaptiveTaskViewProps = {
   onSavePhaseA: (answer: string) => void;
   onTransitionComplete: () => void;
   onSubmit: (phaseBAnswer: string) => void;
+  ui: UiMessages["assessment"];
 };
 
 export function AdaptiveTaskView({
@@ -23,6 +25,7 @@ export function AdaptiveTaskView({
   onSavePhaseA,
   onTransitionComplete,
   onSubmit,
+  ui,
 }: AdaptiveTaskViewProps) {
   useEffect(() => {
     if (phase !== "transition") {
@@ -42,10 +45,10 @@ export function AdaptiveTaskView({
       >
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
-            Adaptive learning
+            {task.eyebrow}
           </p>
           <p className="mt-4 text-[30px] font-semibold tracking-[-0.045em]">
-            Rule update
+            {ui.ruleUpdate}
           </p>
           <div className="mt-6 h-px w-20 bg-[var(--color-accent)]" />
         </div>
@@ -80,7 +83,7 @@ export function AdaptiveTaskView({
             }
           }}
         >
-          Continue
+          {ui.continue}
         </Button>
       </div>
     </TaskFrame>

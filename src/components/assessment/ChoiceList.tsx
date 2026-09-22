@@ -5,6 +5,7 @@ type ChoiceListProps = {
   options: ChoiceOption[];
   value: string | null;
   onChange: (value: string) => void;
+  legend: string;
 };
 
 export function ChoiceList({
@@ -12,10 +13,11 @@ export function ChoiceList({
   options,
   value,
   onChange,
+  legend,
 }: ChoiceListProps) {
   return (
     <fieldset className="border-y border-[var(--color-border)]">
-      <legend className="sr-only">Select one response</legend>
+      <legend className="sr-only">{legend}</legend>
       {options.map((option) => {
         const selected = option.id === value;
 

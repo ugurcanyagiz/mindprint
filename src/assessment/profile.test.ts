@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildCognitiveProfile,
   calculateProfileMetrics,
-  createProfileSummary,
 } from "./profile";
 import type { AssessmentResponse } from "./types";
 
@@ -21,7 +20,7 @@ function response(
   };
 }
 
-const perfectResponses: AssessmentResponse[] = [
+export const perfectResponses: AssessmentResponse[] = [
   response(
     "task-01-information-filtering",
     ["operating-margin", "churn"],
@@ -65,27 +64,20 @@ describe("cognitive profile metrics", () => {
     expect(metrics.responseAccuracy).toBe(83);
     expect(metrics.calibrationGap).toBe(23);
   });
-});
 
-describe("cognitive profile copy", () => {
-  it("avoids percentile or IQ-equivalent claims in interpretation copy", () => {
-    const profile = buildCognitiveProfile(perfectResponses);
-    const combined = [
-      profile.strengthsText,
-      profile.calibrationText,
-      profile.assessmentNote,
-    ].join(" ");
-
-    expect(combined.toLowerCase()).not.toContain("percentile");
-    expect(combined.toLowerCase()).not.toContain("iq");
-    expect(combined.toLowerCase()).not.toContain("you are a");
-  });
-
-  it("creates a complete copyable summary", () => {
-    const summary = createProfileSummary(buildCognitiveProfile(perfectResponses));
-
-    expect(summary).toContain("Cognitive Profile");
-    expect(summary).toContain("Reasoning: 100/100");
-    expect(summary).toContain("not standardized IQ scores");
+  it("keeps the profile domain language-neutral", () => {
+    expect(buildCognitiveProfile(perfectResponses)).toEqual({
+      scores: {
+        reasoning: 100,
+        adaptiveLearning: 100,
+        evidenceEvaluation: 100,
+        informationFiltering: 100,
+        metacognitiveCalibration: 100,
+        knowledgeTransfer: 100,
+      },
+      averageConfidence: 100,
+      responseAccuracy: 100,
+      calibrationGap: 0,
+    });
   });
 });

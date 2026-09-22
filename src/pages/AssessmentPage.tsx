@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { getLocalizedAssessmentTasks } from "../assessment/localization";
 import { buildCognitiveProfile } from "../assessment/profile";
 import { assessmentTasks } from "../assessment/tasks";
 import type {
@@ -15,7 +16,10 @@ import { RankingTaskView } from "../components/assessment/RankingTaskView";
 import { SingleChoiceTaskView } from "../components/assessment/SingleChoiceTaskView";
 import { ProcessingProfile } from "../components/results/ProcessingProfile";
 import { Button } from "../components/ui/Button";
+import { LanguageSelector } from "../components/ui/LanguageSelector";
 import { useAssessmentSession } from "../hooks/useAssessmentSession";
+import { useLocale } from "../i18n/LocaleProvider";
+import { getUiMessages } from "../i18n/messages";
 import { ResultsPage } from "./ResultsPage";
 
 type AssessmentPageProps = {
@@ -31,6 +35,7 @@ function arrayDraft(value: string | string[] | null) {
 }
 
 export function AssessmentPage({ onExit }: AssessmentPageProps) {
+  const { locale } = useLocale();
   const totalTasks = assessmentTasks.length;
   const {
     session,
@@ -44,13 +49,27 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
   } = useAssessmentSession(totalTasks);
   const [profileReady, setProfileReady] = useState(false);
 
-  const currentTask = assessmentTasks[session.currentTaskIndex];
+  const effectiveLocale = session.assessmentLanguage ?? locale;
+  const messages = getUiMessages(effectiveLocale);
+  const localizedTasks = useMemo(
+    () => getLocalizedAssessmentTasks(effectiveLocale),
+    [effectiveLocale],
+  );
+  const currentTask = localizedTasks[session.currentTaskIndex];
   const taskNumber = Math.min(session.currentTaskIndex + 1, totalTasks);
 
   const profile = useMemo(
     () => buildCognitiveProfile(session.responses),
     [session.responses],
   );
+
+  useEffect(() => {
+    document.documentElement.lang = effectiveLocale;
+
+    return () => {
+      document.documentElement.lang = locale;
+    };
+  }, [effectiveLocale, locale]);
 
   useEffect(() => {
     if (session.status !== "completed") {
@@ -69,50 +88,57 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
   if (session.status === "not_started") {
     return (
       <main className="min-h-screen">
-        <header className="mx-auto flex w-full max-w-[900px] items-center justify-between px-5 py-6 sm:px-8 sm:py-7">
-          <span className="text-[12px] font-semibold tracking-[0.24em]">
+        <header className="mx-auto flex w-full max-w-[900px] items-center justify-between gap-4 px-5 py-6 sm:px-8 sm:py-7">
+          <span className="shrink-0 text-[12px] font-semibold tracking-[0.24em]">
             MINDPRINT
           </span>
-          <button
-            className="text-[11px] text-[var(--color-muted)] transition-colors hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-4"
-            type="button"
-            onClick={onExit}
-          >
-            Exit
-          </button>
+          <div className="flex min-w-0 items-center gap-3">
+            <LanguageSelector compact />
+            <button
+              className="shrink-0 text-[11px] text-[var(--color-muted)] transition-colors hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-4"
+              type="button"
+              onClick={onExit}
+            >
+              {messages.assessment.exit}
+            </button>
+          </div>
         </header>
 
         <section className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-[900px] items-center px-5 pb-20 sm:px-8">
           <div className="w-full max-w-[610px]">
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-accent)]">
-              Assessment
+              {messages.assessment.label}
             </p>
-            <h1 className="mt-4 text-balance text-[38px] font-semibold leading-[1.04] tracking-[-0.05em] sm:text-[48px]">
-              A short series of decision tasks.
+            <h1 className="mt-4 text-balance text-[36px] font-semibold leading-[1.06] tracking-[-0.05em] sm:text-[48px]">
+              {messages.assessment.introTitle}
             </h1>
-            <p className="mt-5 max-w-[560px] text-[16px] leading-7 text-[var(--color-muted)]">
-              Work at a natural pace. Some tasks ask how confident you are in
-              your response.
+            <p className="mt-5 max-w-[580px] text-[16px] leading-7 text-[var(--color-muted)]">
+              {messages.assessment.introBody}
             </p>
 
-            <div className="mt-9 flex gap-12 border-y border-[var(--color-border)] py-5">
+            <div className="mt-9 flex gap-10 border-y border-[var(--color-border)] py-5 sm:gap-12">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-muted)]">
-                  Duration
+                  {messages.assessment.duration}
                 </p>
-                <p className="mt-1.5 text-sm font-medium">~10 minutes</p>
+                <p className="mt-1.5 text-sm font-medium">
+                  {messages.assessment.durationValue}
+                </p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-muted)]">
-                  Tasks
+                  {messages.assessment.tasks}
                 </p>
                 <p className="mt-1.5 text-sm font-medium">{totalTasks}</p>
               </div>
             </div>
 
             <div className="mt-9">
-              <Button className="min-w-[154px]" onClick={begin}>
-                Start assessment
+              <Button
+                className="min-w-[154px]"
+                onClick={() => begin(locale)}
+              >
+                {messages.assessment.startAssessment}
               </Button>
             </div>
           </div>
@@ -123,12 +149,18 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
 
   if (session.status === "completed") {
     if (!profileReady) {
-      return <ProcessingProfile onComplete={handleProfileReady} />;
+      return (
+        <ProcessingProfile
+          onComplete={handleProfileReady}
+          messages={messages.results}
+        />
+      );
     }
 
     return (
       <ResultsPage
         profile={profile}
+        locale={effectiveLocale}
         onRetake={() => {
           reset();
           setProfileReady(false);
@@ -198,7 +230,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
     <main className="min-h-screen">
       <header className="mx-auto w-full max-w-[900px] px-5 pt-6 sm:px-8 sm:pt-7">
         <div className="flex items-center justify-between gap-4 pb-4">
-          <span className="text-[12px] font-semibold tracking-[0.24em]">
+          <span className="shrink-0 text-[12px] font-semibold tracking-[0.24em]">
             MINDPRINT
           </span>
           <div className="flex items-center gap-4">
@@ -211,11 +243,15 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               type="button"
               onClick={onExit}
             >
-              Exit
+              {messages.assessment.exit}
             </button>
           </div>
         </div>
-        <ProgressLine current={taskNumber} total={totalTasks} />
+        <ProgressLine
+          current={taskNumber}
+          total={totalTasks}
+          label={messages.assessment.progressLabel}
+        />
       </header>
 
       <section className="mx-auto w-full max-w-[900px] px-5 pb-20 pt-12 sm:px-8 sm:pt-16">
@@ -228,6 +264,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               onAnswerChange={setDraftAnswer}
               onConfidenceChange={setConfidence}
               onSubmit={() => handleMultiSelectSubmit(currentTask)}
+              ui={messages.assessment}
             />
           ) : currentTask.kind === "ranking" ? (
             <RankingTaskView
@@ -241,6 +278,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               onAnswerChange={setDraftAnswer}
               onConfidenceChange={setConfidence}
               onSubmit={(answer) => handleRankingSubmit(currentTask, answer)}
+              ui={messages.assessment}
             />
           ) : currentTask.kind === "adaptive-rule" ? (
             <AdaptiveTaskView
@@ -253,6 +291,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               onSubmit={(phaseBAnswer) =>
                 handleAdaptiveSubmit(currentTask, phaseBAnswer)
               }
+              ui={messages.assessment}
             />
           ) : (
             <SingleChoiceTaskView
@@ -262,6 +301,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               onAnswerChange={setDraftAnswer}
               onConfidenceChange={setConfidence}
               onSubmit={() => handleSingleChoiceSubmit(currentTask)}
+              ui={messages.assessment}
             />
           )}
         </div>
