@@ -1,5 +1,6 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { buildCognitiveProfile } from "../assessment/profile";
 import { assessmentTasks } from "../assessment/tasks";
 import type {
   AdaptiveRuleTask,
@@ -12,8 +13,10 @@ import { MetricSelectionTaskView } from "../components/assessment/MetricSelectio
 import { ProgressLine } from "../components/assessment/ProgressLine";
 import { RankingTaskView } from "../components/assessment/RankingTaskView";
 import { SingleChoiceTaskView } from "../components/assessment/SingleChoiceTaskView";
+import { ProcessingProfile } from "../components/results/ProcessingProfile";
 import { Button } from "../components/ui/Button";
 import { useAssessmentSession } from "../hooks/useAssessmentSession";
+import { ResultsPage } from "./ResultsPage";
 
 type AssessmentPageProps = {
   onExit: () => void;
@@ -39,13 +42,29 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
     submitResponse,
     reset,
   } = useAssessmentSession(totalTasks);
+  const [profileReady, setProfileReady] = useState(false);
 
   const currentTask = assessmentTasks[session.currentTaskIndex];
   const taskNumber = Math.min(session.currentTaskIndex + 1, totalTasks);
 
+  const profile = useMemo(
+    () => buildCognitiveProfile(session.responses),
+    [session.responses],
+  );
+
+  useEffect(() => {
+    if (session.status !== "completed") {
+      setProfileReady(false);
+    }
+  }, [session.status]);
+
   const handleAdaptiveTransitionComplete = useCallback(() => {
     moveToAdaptivePhaseB();
   }, [moveToAdaptivePhaseB]);
+
+  const handleProfileReady = useCallback(() => {
+    setProfileReady(true);
+  }, []);
 
   if (session.status === "not_started") {
     return (
@@ -109,36 +128,24 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
     );
   }
 
-  if (session.status === "completed" || !currentTask) {
+  if (session.status === "completed") {
+    if (!profileReady) {
+      return <ProcessingProfile onComplete={handleProfileReady} />;
+    }
+
     return (
-      <main className="min-h-screen">
-        <section className="mx-auto flex min-h-screen w-full max-w-[920px] items-center px-5 py-20 sm:px-8">
-          <div className="w-full max-w-[620px]">
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-accent)]">
-              Assessment
-            </p>
-            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
-              Assessment complete.
-            </h1>
-            <p className="mt-6 text-[17px] leading-7 text-[var(--color-muted)]">
-              Your responses have been saved on this device.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Button onClick={onExit}>Return to overview</Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  reset();
-                  window.requestAnimationFrame(begin);
-                }}
-              >
-                Start again
-              </Button>
-            </div>
-          </div>
-        </section>
-      </main>
+      <ResultsPage
+        profile={profile}
+        onRetake={() => {
+          reset();
+          setProfileReady(false);
+        }}
+      />
     );
+  }
+
+  if (!currentTask) {
+    return null;
   }
 
   const handleSingleChoiceSubmit = (task: SingleChoiceTask) => {
