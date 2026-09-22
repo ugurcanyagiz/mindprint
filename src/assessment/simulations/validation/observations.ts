@@ -120,7 +120,7 @@ export function deriveObservations(
           ["attentionControl"],
           "distractor-capture",
           distractorSelections.length > 0,
-          distractorSelections,
+          selectionTraces,
         ),
       );
     }
