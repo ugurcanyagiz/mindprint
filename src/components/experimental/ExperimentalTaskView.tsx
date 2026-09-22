@@ -31,12 +31,13 @@ export function ExperimentalTaskView({
 }: ExperimentalTaskViewProps) {
   const phase = task.phases[state.phaseIndex];
   const ui = getUiMessages("en").assessment;
-  const isMulti = phase.response.kind === "multi-select";
+  const response = phase.response;
+  const multiResponse = response.kind === "multi-select" ? response : null;
   const selected = selectedArray(state.draftAnswer);
 
   const canContinue =
-    phase.response.kind === "multi-select"
-      ? selected.length === phase.response.selectionLimit
+    multiResponse !== null
+      ? selected.length === multiResponse.selectionLimit
       : typeof state.draftAnswer === "string" &&
         state.draftAnswer.trim().length > 0;
 
@@ -143,13 +144,12 @@ export function ExperimentalTaskView({
         />
       ) : null}
 
-      {isMulti ? (
+      {multiResponse ? (
         <div className="border-y border-[var(--color-border)]">
-          {phase.response.kind === "multi-select"
-            ? phase.response.items.map((item) => {
+          {multiResponse.items.map((item) => {
                 const checked = selected.includes(item.id);
                 const disabled =
-                  selected.length >= phase.response.selectionLimit &&
+                  selected.length >= multiResponse.selectionLimit &&
                   !checked;
 
                 return (
@@ -169,7 +169,7 @@ export function ExperimentalTaskView({
                         toggleExperimentalSelection(
                           selected,
                           item.id,
-                          phase.response.selectionLimit,
+                          multiResponse.selectionLimit,
                         ),
                       )
                     }
@@ -202,14 +202,13 @@ export function ExperimentalTaskView({
                     </span>
                   </button>
                 );
-              })
-            : null}
+              })}
         </div>
       ) : null}
 
-      {isMulti && phase.response.kind === "multi-select" ? (
+      {multiResponse ? (
         <p className="mt-2.5 text-[11px] text-[var(--color-muted)]">
-          {selected.length} / {phase.response.selectionLimit} selected
+          {selected.length} / {multiResponse.selectionLimit} selected
         </p>
       ) : null}
 
