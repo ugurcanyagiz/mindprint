@@ -12,17 +12,17 @@ export function Button({
 }: ButtonProps) {
   const variantClasses =
     variant === "primary"
-      ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-strong)]"
-      : "border border-[var(--color-border)] bg-white text-[var(--color-foreground)] hover:bg-[var(--color-surface)]";
+      ? "border border-[var(--color-accent)] bg-[var(--color-accent)] text-white hover:border-[var(--color-accent-strong)] hover:bg-[var(--color-accent-strong)]"
+      : "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-foreground)] hover:bg-white";
 
   return (
     <button
       type={type}
       className={[
-        "inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium",
-        "transition-colors duration-200",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-11 items-center justify-center rounded-[10px] px-5 py-2.5 text-[13px] font-medium tracking-[-0.01em]",
+        "transition-[background-color,border-color,color,opacity] duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]",
+        "disabled:cursor-not-allowed disabled:opacity-40",
         variantClasses,
         className,
       ].join(" ")}

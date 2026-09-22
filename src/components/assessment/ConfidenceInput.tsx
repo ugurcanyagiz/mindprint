@@ -10,16 +10,13 @@ export function ConfidenceInput({
   onChange,
 }: ConfidenceInputProps) {
   return (
-    <div className="mt-10 border-t border-[var(--color-border)] pt-7">
+    <div className="mt-8 border-t border-[var(--color-border)] pt-6">
       <div className="flex items-center justify-between gap-6">
-        <label
-          className="text-sm font-medium"
-          htmlFor="assessment-confidence"
-        >
+        <label className="text-sm font-medium" htmlFor="assessment-confidence">
           Confidence
         </label>
         <output
-          className="text-sm tabular-nums text-[var(--color-muted)]"
+          className="text-xs tabular-nums text-[var(--color-muted)]"
           htmlFor="assessment-confidence"
         >
           {value}%
@@ -28,7 +25,7 @@ export function ConfidenceInput({
 
       <input
         id="assessment-confidence"
-        className="confidence-range mt-5 w-full"
+        className="confidence-range mt-4 w-full"
         type="range"
         min={0}
         max={100}
@@ -39,7 +36,7 @@ export function ConfidenceInput({
       />
 
       <div
-        className="mt-2 flex justify-between text-[11px] text-[var(--color-muted)]"
+        className="mt-1.5 flex justify-between text-[10px] uppercase tracking-[0.08em] text-[var(--color-muted-soft)]"
         aria-hidden="true"
       >
         <span>Low</span>

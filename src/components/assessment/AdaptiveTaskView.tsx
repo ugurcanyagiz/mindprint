@@ -36,18 +36,18 @@ export function AdaptiveTaskView({
   if (phase === "transition") {
     return (
       <div
-        className="flex min-h-[360px] items-center"
+        className="flex min-h-[320px] items-center"
         aria-live="polite"
         aria-atomic="true"
       >
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--color-muted)]">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
             Adaptive learning
           </p>
-          <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">
+          <p className="mt-4 text-[30px] font-semibold tracking-[-0.045em]">
             Rule update
           </p>
-          <div className="mt-7 h-px w-28 bg-[var(--color-accent)]" />
+          <div className="mt-6 h-px w-20 bg-[var(--color-accent)]" />
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ export function AdaptiveTaskView({
         onChange={onDraftChange}
       />
 
-      <div className="mt-10 flex justify-end">
+      <div className="mt-8 flex justify-end">
         <Button
           disabled={!canContinue}
           onClick={() => {

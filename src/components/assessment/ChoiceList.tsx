@@ -14,7 +14,7 @@ export function ChoiceList({
   onChange,
 }: ChoiceListProps) {
   return (
-    <fieldset className="space-y-3">
+    <fieldset className="border-y border-[var(--color-border)]">
       <legend className="sr-only">Select one response</legend>
       {options.map((option) => {
         const selected = option.id === value;
@@ -23,14 +23,13 @@ export function ChoiceList({
           <label
             key={option.id}
             className={[
-              "flex cursor-pointer items-start gap-4 rounded-xl border px-4 py-4 transition-colors duration-150 sm:px-5",
-              selected
-                ? "border-[var(--color-accent)] bg-white"
-                : "border-[var(--color-border)] bg-white hover:border-[#cbd2dc]",
+              "flex min-h-[58px] cursor-pointer items-center gap-4 border-b border-[var(--color-border)] px-1 py-3.5 last:border-b-0",
+              "transition-[background-color,color] duration-150",
+              selected ? "bg-white/70" : "hover:bg-white/45",
             ].join(" ")}
           >
             <input
-              className="mt-1 h-4 w-4 shrink-0 accent-[var(--color-accent)]"
+              className="h-4 w-4 shrink-0 accent-[var(--color-accent)]"
               type="radio"
               name={name}
               value={option.id}

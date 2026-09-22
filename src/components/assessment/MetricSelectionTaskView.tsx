@@ -33,11 +33,19 @@ export function MetricSelectionTaskView({
 
   return (
     <TaskFrame eyebrow={task.eyebrow} title={task.title}>
-      <p className="mb-7 max-w-[620px] text-[15px] leading-7 text-[var(--color-muted)]">
+      <p className="max-w-[600px] text-[14px] leading-6 text-[var(--color-muted)]">
         {task.context}
       </p>
+      <div className="mt-6 flex items-end justify-between gap-6">
+        <p className="max-w-[590px] text-[18px] font-medium leading-7 tracking-[-0.02em]">
+          {task.prompt}
+        </p>
+        <span className="shrink-0 pb-1 text-[11px] tabular-nums text-[var(--color-muted)]">
+          {answer.length} / {task.selectionLimit}
+        </span>
+      </div>
 
-      <div className="border-y border-[var(--color-border)]">
+      <div className="mt-5 border-y border-[var(--color-border)]">
         {task.metrics.map((metric) => {
           const selected = answer.includes(metric.id);
           const atLimit = answer.length >= task.selectionLimit;
@@ -47,9 +55,11 @@ export function MetricSelectionTaskView({
             <button
               key={metric.id}
               className={[
-                "grid w-full grid-cols-[1fr_auto] items-center gap-6 border-b border-[var(--color-border)] px-1 py-4 text-left last:border-b-0",
+                "grid min-h-[56px] w-full grid-cols-[1fr_auto] items-center gap-6 border-b border-[var(--color-border)] px-1 py-3 text-left last:border-b-0",
+                "transition-[background-color,opacity] duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-focus)]",
-                disabled ? "cursor-not-allowed opacity-45" : "hover:bg-white/60",
+                selected ? "bg-white/70" : "hover:bg-white/45",
+                disabled ? "cursor-not-allowed opacity-40" : "",
               ].join(" ")}
               type="button"
               aria-pressed={selected}
@@ -62,7 +72,7 @@ export function MetricSelectionTaskView({
                     "grid h-4 w-4 place-items-center rounded-[4px] border",
                     selected
                       ? "border-[var(--color-accent)] bg-[var(--color-accent)]"
-                      : "border-[#c8ced7] bg-white",
+                      : "border-[var(--color-border-strong)] bg-white",
                   ].join(" ")}
                   aria-hidden="true"
                 >
@@ -80,21 +90,9 @@ export function MetricSelectionTaskView({
         })}
       </div>
 
-      <div className="mt-7 flex items-center justify-between gap-4">
-        <p className="text-xl font-medium tracking-[-0.025em]">
-          {task.prompt}
-        </p>
-        <span className="shrink-0 text-xs tabular-nums text-[var(--color-muted)]">
-          {answer.length} / {task.selectionLimit}
-        </span>
-      </div>
+      <ConfidenceInput value={confidence} onChange={onConfidenceChange} />
 
-      <ConfidenceInput
-        value={confidence}
-        onChange={onConfidenceChange}
-      />
-
-      <div className="mt-10 flex justify-end">
+      <div className="mt-8 flex justify-end">
         <Button
           disabled={answer.length !== task.selectionLimit}
           onClick={onSubmit}

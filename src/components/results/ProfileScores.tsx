@@ -26,14 +26,19 @@ export function ProfileScores({ profile }: ProfileScoresProps) {
         return (
           <div
             key={dimension}
-            className="grid gap-3 border-b border-[var(--color-border)] py-5 sm:grid-cols-[210px_1fr_52px] sm:items-center sm:gap-6"
+            className="grid gap-2.5 border-b border-[var(--color-border)] py-4.5 sm:grid-cols-[205px_1fr_44px] sm:items-center sm:gap-6"
           >
-            <span className="text-sm font-medium">
-              {dimensionLabels[dimension]}
-            </span>
+            <div className="flex items-center justify-between gap-4 sm:block">
+              <span className="text-sm font-medium">
+                {dimensionLabels[dimension]}
+              </span>
+              <span className="text-xs tabular-nums text-[var(--color-muted)] sm:hidden">
+                {score}
+              </span>
+            </div>
 
             <div
-              className="h-1.5 overflow-hidden rounded-full bg-[#e8ebef]"
+              className="h-[5px] overflow-hidden rounded-full bg-[var(--color-track)]"
               role="meter"
               aria-label={dimensionLabels[dimension]}
               aria-valuemin={0}
@@ -46,7 +51,7 @@ export function ProfileScores({ profile }: ProfileScoresProps) {
               />
             </div>
 
-            <span className="text-right text-sm tabular-nums text-[var(--color-muted)]">
+            <span className="hidden text-right text-xs tabular-nums text-[var(--color-muted)] sm:block">
               {score}
             </span>
           </div>

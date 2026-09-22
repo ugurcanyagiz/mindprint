@@ -15,11 +15,11 @@ export function RulePanel({
 }: RulePanelProps) {
   return (
     <div>
-      <div className="border-y border-[var(--color-border)]">
+      <div className="max-w-[520px] border-y border-[var(--color-border)]">
         {examples.map((example) => (
           <div
             key={example.expression}
-            className="grid grid-cols-[1fr_auto] items-center gap-8 border-b border-[var(--color-border)] py-4 last:border-b-0"
+            className="grid min-h-[54px] grid-cols-[1fr_auto] items-center gap-8 border-b border-[var(--color-border)] py-3 last:border-b-0"
           >
             <span className="font-mono text-sm tracking-[-0.01em]">
               {example.expression}
@@ -32,14 +32,14 @@ export function RulePanel({
       </div>
 
       <label
-        className="mt-9 block text-xl font-medium tracking-[-0.025em]"
+        className="mt-8 block text-[18px] font-medium tracking-[-0.02em]"
         htmlFor="rule-response"
       >
         {prompt}
       </label>
       <input
         id="rule-response"
-        className="mt-4 w-full max-w-[220px] rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 text-lg tabular-nums outline-none transition-colors focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/15"
+        className="mt-3 w-full max-w-[180px] rounded-[9px] border border-[var(--color-border-strong)] bg-white px-4 py-3 text-lg tabular-nums outline-none transition-[border-color,box-shadow] focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/10"
         type="number"
         inputMode="numeric"
         autoComplete="off"

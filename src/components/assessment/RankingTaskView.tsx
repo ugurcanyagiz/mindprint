@@ -42,16 +42,16 @@ export function RankingTaskView({
 
   return (
     <TaskFrame eyebrow={task.eyebrow} title={task.title}>
-      <div className="mb-8 border-l-2 border-[var(--color-accent)] pl-5">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
+      <div className="border-l border-[var(--color-accent)] pl-4">
+        <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-[var(--color-muted)]">
           Claim
         </p>
-        <p className="mt-3 text-[16px] leading-7 text-[var(--color-foreground-soft)]">
+        <p className="mt-2 text-[15px] leading-6 text-[var(--color-foreground-soft)]">
           {task.claim}
         </p>
       </div>
 
-      <p className="mb-5 text-xl font-medium tracking-[-0.025em]">
+      <p className="mb-4 mt-7 text-[18px] font-medium leading-7 tracking-[-0.02em]">
         {task.prompt}
       </p>
 
@@ -66,22 +66,22 @@ export function RankingTaskView({
           return (
             <li
               key={item.id}
-              className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-[var(--color-border)] py-4 last:border-b-0"
+              className="grid min-h-[68px] grid-cols-[30px_1fr_auto] items-center gap-3 border-b border-[var(--color-border)] py-3.5 last:border-b-0"
             >
-              <span className="text-xs tabular-nums text-[var(--color-muted-soft)]">
+              <span className="text-[11px] tabular-nums text-[var(--color-muted-soft)]">
                 {String(index + 1).padStart(2, "0")}
               </span>
 
               <div>
                 <p className="text-sm font-medium">{item.label}</p>
-                <p className="mt-1 text-xs leading-5 text-[var(--color-muted)]">
+                <p className="mt-0.5 text-xs leading-5 text-[var(--color-muted)]">
                   {item.detail}
                 </p>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 <button
-                  className="rounded-md px-2 py-1.5 text-xs text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-md px-2 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === 0}
                   aria-label={`Move ${item.label} up`}
@@ -90,7 +90,7 @@ export function RankingTaskView({
                   Up
                 </button>
                 <button
-                  className="rounded-md px-2 py-1.5 text-xs text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-md px-2 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === order.length - 1}
                   aria-label={`Move ${item.label} down`}
@@ -104,16 +104,13 @@ export function RankingTaskView({
         })}
       </ol>
 
-      <p className="mt-3 text-xs text-[var(--color-muted)]">
+      <p className="mt-2.5 text-[11px] text-[var(--color-muted)]">
         1 = most influential
       </p>
 
-      <ConfidenceInput
-        value={confidence}
-        onChange={onConfidenceChange}
-      />
+      <ConfidenceInput value={confidence} onChange={onConfidenceChange} />
 
-      <div className="mt-10 flex justify-end">
+      <div className="mt-8 flex justify-end">
         <Button disabled={!answer} onClick={onSubmit}>
           Continue
         </Button>
