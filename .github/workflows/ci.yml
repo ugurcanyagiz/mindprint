@@ -28,5 +28,8 @@ jobs:
       - name: TypeScript check
         run: npm run check
 
+      - name: Scoring tests
+        run: npm test
+
       - name: Production build
         run: npm run build
