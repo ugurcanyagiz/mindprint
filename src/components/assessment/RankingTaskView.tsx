@@ -1,0 +1,123 @@
+import type { RankingTask } from "../../assessment/types";
+import { Button } from "../ui/Button";
+import { ConfidenceInput } from "./ConfidenceInput";
+import { TaskFrame } from "./TaskFrame";
+
+type RankingTaskViewProps = {
+  task: RankingTask;
+  answer: string[] | null;
+  confidence: number;
+  onAnswerChange: (value: string[]) => void;
+  onConfidenceChange: (value: number) => void;
+  onSubmit: () => void;
+};
+
+function moveItem(order: string[], index: number, direction: -1 | 1) {
+  const nextIndex = index + direction;
+
+  if (nextIndex < 0 || nextIndex >= order.length) {
+    return order;
+  }
+
+  const next = [...order];
+  [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+  return next;
+}
+
+export function RankingTaskView({
+  task,
+  answer,
+  confidence,
+  onAnswerChange,
+  onConfidenceChange,
+  onSubmit,
+}: RankingTaskViewProps) {
+  const initialOrder = task.items.map((item) => item.id);
+  const order = answer ?? initialOrder;
+  const itemsById = new Map(task.items.map((item) => [item.id, item]));
+
+  const reorder = (index: number, direction: -1 | 1) => {
+    onAnswerChange(moveItem(order, index, direction));
+  };
+
+  return (
+    <TaskFrame eyebrow={task.eyebrow} title={task.title}>
+      <div className="mb-8 border-l-2 border-[var(--color-accent)] pl-5">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
+          Claim
+        </p>
+        <p className="mt-3 text-[16px] leading-7 text-[var(--color-foreground-soft)]">
+          {task.claim}
+        </p>
+      </div>
+
+      <p className="mb-5 text-xl font-medium tracking-[-0.025em]">
+        {task.prompt}
+      </p>
+
+      <ol className="border-y border-[var(--color-border)]">
+        {order.map((id, index) => {
+          const item = itemsById.get(id);
+
+          if (!item) {
+            return null;
+          }
+
+          return (
+            <li
+              key={item.id}
+              className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-[var(--color-border)] py-4 last:border-b-0"
+            >
+              <span className="text-xs tabular-nums text-[var(--color-muted-soft)]">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <div>
+                <p className="text-sm font-medium">{item.label}</p>
+                <p className="mt-1 text-xs leading-5 text-[var(--color-muted)]">
+                  {item.detail}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  className="rounded-md px-2 py-1.5 text-xs text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-30"
+                  type="button"
+                  disabled={index === 0}
+                  aria-label={`Move ${item.label} up`}
+                  onClick={() => reorder(index, -1)}
+                >
+                  Up
+                </button>
+                <button
+                  className="rounded-md px-2 py-1.5 text-xs text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-30"
+                  type="button"
+                  disabled={index === order.length - 1}
+                  aria-label={`Move ${item.label} down`}
+                  onClick={() => reorder(index, 1)}
+                >
+                  Down
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+
+      <p className="mt-3 text-xs text-[var(--color-muted)]">
+        1 = most influential
+      </p>
+
+      <ConfidenceInput
+        value={confidence}
+        onChange={onConfidenceChange}
+      />
+
+      <div className="mt-10 flex justify-end">
+        <Button disabled={!answer} onClick={onSubmit}>
+          Continue
+        </Button>
+      </div>
+    </TaskFrame>
+  );
+}

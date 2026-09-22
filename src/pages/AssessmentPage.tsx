@@ -1,9 +1,16 @@
 import { useCallback } from "react";
 
 import { assessmentTasks } from "../assessment/tasks";
-import type { AdaptiveRuleTask, SingleChoiceTask } from "../assessment/types";
+import type {
+  AdaptiveRuleTask,
+  MultiSelectTask,
+  RankingTask,
+  SingleChoiceTask,
+} from "../assessment/types";
 import { AdaptiveTaskView } from "../components/assessment/AdaptiveTaskView";
+import { MetricSelectionTaskView } from "../components/assessment/MetricSelectionTaskView";
 import { ProgressLine } from "../components/assessment/ProgressLine";
+import { RankingTaskView } from "../components/assessment/RankingTaskView";
 import { SingleChoiceTaskView } from "../components/assessment/SingleChoiceTaskView";
 import { Button } from "../components/ui/Button";
 import { useAssessmentSession } from "../hooks/useAssessmentSession";
@@ -11,6 +18,14 @@ import { useAssessmentSession } from "../hooks/useAssessmentSession";
 type AssessmentPageProps = {
   onExit: () => void;
 };
+
+function stringDraft(value: string | string[] | null) {
+  return typeof value === "string" ? value : null;
+}
+
+function arrayDraft(value: string | string[] | null) {
+  return Array.isArray(value) ? value : [];
+}
 
 export function AssessmentPage({ onExit }: AssessmentPageProps) {
   const totalTasks = assessmentTasks.length;
@@ -66,11 +81,11 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
                 <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
                   Duration
                 </p>
-                <p className="mt-2 text-sm font-medium">~6 minutes</p>
+                <p className="mt-2 text-sm font-medium">~10 minutes</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                  Live tasks
+                  Tasks
                 </p>
                 <p className="mt-2 text-sm font-medium">{totalTasks}</p>
               </div>
@@ -127,14 +142,44 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
   }
 
   const handleSingleChoiceSubmit = (task: SingleChoiceTask) => {
-    if (!session.draftAnswer) {
+    const answer = stringDraft(session.draftAnswer);
+
+    if (!answer) {
       return;
     }
 
     submitResponse({
       taskId: task.id,
-      answer: session.draftAnswer,
+      answer,
       confidence: task.confidenceRequired ? session.confidence : undefined,
+    });
+  };
+
+  const handleMultiSelectSubmit = (task: MultiSelectTask) => {
+    const answer = arrayDraft(session.draftAnswer);
+
+    if (answer.length !== task.selectionLimit) {
+      return;
+    }
+
+    submitResponse({
+      taskId: task.id,
+      answer,
+      confidence: session.confidence,
+    });
+  };
+
+  const handleRankingSubmit = (task: RankingTask) => {
+    const answer = arrayDraft(session.draftAnswer);
+
+    if (answer.length !== task.items.length) {
+      return;
+    }
+
+    submitResponse({
+      taskId: task.id,
+      answer,
+      confidence: session.confidence,
     });
   };
 
@@ -177,11 +222,33 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
 
       <section className="mx-auto w-full max-w-[920px] px-5 pb-20 pt-16 sm:px-8 sm:pt-20">
         <div className="max-w-[720px]">
-          {currentTask.kind === "adaptive-rule" ? (
+          {currentTask.kind === "multi-select" ? (
+            <MetricSelectionTaskView
+              task={currentTask}
+              answer={arrayDraft(session.draftAnswer)}
+              confidence={session.confidence}
+              onAnswerChange={setDraftAnswer}
+              onConfidenceChange={setConfidence}
+              onSubmit={() => handleMultiSelectSubmit(currentTask)}
+            />
+          ) : currentTask.kind === "ranking" ? (
+            <RankingTaskView
+              task={currentTask}
+              answer={
+                Array.isArray(session.draftAnswer)
+                  ? session.draftAnswer
+                  : null
+              }
+              confidence={session.confidence}
+              onAnswerChange={setDraftAnswer}
+              onConfidenceChange={setConfidence}
+              onSubmit={() => handleRankingSubmit(currentTask)}
+            />
+          ) : currentTask.kind === "adaptive-rule" ? (
             <AdaptiveTaskView
               task={currentTask}
               phase={session.adaptivePhase}
-              draftAnswer={session.draftAnswer}
+              draftAnswer={stringDraft(session.draftAnswer)}
               onDraftChange={setDraftAnswer}
               onSavePhaseA={saveAdaptivePhaseA}
               onTransitionComplete={handleAdaptiveTransitionComplete}
@@ -192,7 +259,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
           ) : (
             <SingleChoiceTaskView
               task={currentTask}
-              answer={session.draftAnswer}
+              answer={stringDraft(session.draftAnswer)}
               confidence={session.confidence}
               onAnswerChange={setDraftAnswer}
               onConfidenceChange={setConfidence}

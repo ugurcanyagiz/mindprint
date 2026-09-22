@@ -1,7 +1,7 @@
 import type { AssessmentSession } from "./types";
 
 export const ASSESSMENT_SESSION_KEY = "assessment-session";
-export const ASSESSMENT_SESSION_VERSION = 2;
+export const ASSESSMENT_SESSION_VERSION = 3;
 
 export function createInitialSession(): AssessmentSession {
   return {

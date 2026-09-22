@@ -6,6 +6,91 @@ import type { AssessmentTask } from "./types";
  */
 export const assessmentTasks: AssessmentTask[] = [
   {
+    id: "task-01-information-filtering",
+    kind: "multi-select",
+    dimension: "informationFiltering",
+    version: 1,
+    order: 1,
+    eyebrow: "Information filtering",
+    title: "Identify the signals that matter most.",
+    context:
+      "A subscription software company reports the following quarterly changes.",
+    prompt:
+      "Which TWO metrics deserve the most attention before concluding that growth is healthy?",
+    metrics: [
+      { id: "revenue", label: "Revenue", value: "+14%" },
+      { id: "customers", label: "Customers", value: "+28%" },
+      { id: "operating-margin", label: "Operating margin", value: "-6 pts" },
+      { id: "marketing-expense", label: "Marketing expense", value: "+41%" },
+      { id: "churn", label: "Churn", value: "+3 pts" },
+      { id: "headcount", label: "Headcount", value: "+18%" },
+    ],
+    selectionLimit: 2,
+    answerKey: ["operating-margin", "churn"],
+    confidenceRequired: true,
+  },
+  {
+    id: "task-02-reasoning",
+    kind: "single-choice",
+    dimension: "reasoning",
+    version: 1,
+    order: 2,
+    eyebrow: "Reasoning",
+    title: "Evaluate the conclusion, not the wording.",
+    analysis:
+      "Sales increased 20% and costs increased 10%, therefore profitability necessarily improved.",
+    prompt: "How should this conclusion be evaluated?",
+    options: [
+      { id: "supported", label: "Supported" },
+      { id: "probably-supported", label: "Probably supported" },
+      { id: "insufficient", label: "Insufficient information" },
+      { id: "probably-unsupported", label: "Probably unsupported" },
+      { id: "unsupported", label: "Unsupported" },
+    ],
+    answerKey: "insufficient",
+    confidenceRequired: true,
+  },
+  {
+    id: "task-03-evidence-evaluation",
+    kind: "ranking",
+    dimension: "evidenceEvaluation",
+    version: 1,
+    order: 3,
+    eyebrow: "Evidence evaluation",
+    title: "Weight evidence by its decision value.",
+    claim: "A new supplement improves memory by 40%.",
+    prompt: "Rank the sources from most to least influential for your decision.",
+    items: [
+      {
+        id: "viral-video",
+        label: "Viral video",
+        detail: "2.1M views · no methods shown",
+      },
+      {
+        id: "manufacturer-study",
+        label: "Manufacturer-funded study",
+        detail: "n=48 · positive result",
+      },
+      {
+        id: "observational-study",
+        label: "Independent observational study",
+        detail: "n=1,200 · small association",
+      },
+      {
+        id: "rct",
+        label: "Independent randomized controlled trial",
+        detail: "n=8,400 · no meaningful effect",
+      },
+    ],
+    answerKey: [
+      "rct",
+      "observational-study",
+      "manufacturer-study",
+      "viral-video",
+    ],
+    confidenceRequired: true,
+  },
+  {
     id: "task-04-adaptive-rule",
     kind: "adaptive-rule",
     dimension: "adaptiveLearning",

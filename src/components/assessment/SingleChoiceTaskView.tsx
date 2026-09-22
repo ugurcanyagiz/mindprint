@@ -34,6 +34,17 @@ export function SingleChoiceTaskView({
         </div>
       ) : null}
 
+      {task.analysis ? (
+        <div className="mb-8 border-y border-[var(--color-border)] py-5">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Automated analysis
+          </p>
+          <p className="mt-3 max-w-[650px] text-[16px] leading-7 text-[var(--color-foreground-soft)]">
+            “{task.analysis}”
+          </p>
+        </div>
+      ) : null}
+
       {task.context ? (
         <div className="mb-8 border-y border-[var(--color-border)] py-5">
           {task.context.map((line) => (

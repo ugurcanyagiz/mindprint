@@ -8,6 +8,7 @@ import {
   updateSession,
 } from "../assessment/session";
 import type {
+  AssessmentDraftAnswer,
   AssessmentResponse,
   AssessmentSession,
   Confidence,
@@ -43,7 +44,7 @@ export function useAssessmentSession(totalTasks: number) {
     setSession((current) => updateSession(current, { confidence }));
   };
 
-  const setDraftAnswer = (draftAnswer: string | null) => {
+  const setDraftAnswer = (draftAnswer: AssessmentDraftAnswer) => {
     setSession((current) => updateSession(current, { draftAnswer }));
   };
 

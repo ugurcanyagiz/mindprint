@@ -9,10 +9,23 @@ export const cognitiveDimensions = [
 
 export type CognitiveDimension = (typeof cognitiveDimensions)[number];
 export type Confidence = number;
+export type AssessmentDraftAnswer = string | string[] | null;
 
 export type ChoiceOption = {
   id: string;
   label: string;
+};
+
+export type MetricItem = {
+  id: string;
+  label: string;
+  value: string;
+};
+
+export type RankingItem = {
+  id: string;
+  label: string;
+  detail: string;
 };
 
 export type RuleExample = {
@@ -27,6 +40,25 @@ type AssessmentTaskBase = {
   order: number;
   eyebrow: string;
   title: string;
+};
+
+export type MultiSelectTask = AssessmentTaskBase & {
+  kind: "multi-select";
+  context: string;
+  prompt: string;
+  metrics: MetricItem[];
+  selectionLimit: number;
+  answerKey: string[];
+  confidenceRequired: boolean;
+};
+
+export type RankingTask = AssessmentTaskBase & {
+  kind: "ranking";
+  claim: string;
+  prompt: string;
+  items: RankingItem[];
+  answerKey: string[];
+  confidenceRequired: boolean;
 };
 
 export type AdaptiveRuleTask = AssessmentTaskBase & {
@@ -51,13 +83,18 @@ export type SingleChoiceTask = AssessmentTaskBase & {
   kind: "single-choice";
   context?: string[];
   principle?: string;
+  analysis?: string;
   prompt: string;
   options: ChoiceOption[];
   answerKey: string;
   confidenceRequired: boolean;
 };
 
-export type AssessmentTask = AdaptiveRuleTask | SingleChoiceTask;
+export type AssessmentTask =
+  | MultiSelectTask
+  | RankingTask
+  | AdaptiveRuleTask
+  | SingleChoiceTask;
 
 export type AssessmentResponse = {
   taskId: string;
@@ -72,11 +109,11 @@ export type DimensionScores = Record<CognitiveDimension, number>;
 export type AdaptivePhase = "phase-a" | "transition" | "phase-b";
 
 export type AssessmentSession = {
-  version: 2;
+  version: 3;
   status: "not_started" | "in_progress" | "completed";
   currentTaskIndex: number;
   confidence: Confidence;
-  draftAnswer: string | null;
+  draftAnswer: AssessmentDraftAnswer;
   adaptivePhase: AdaptivePhase;
   adaptivePhaseAAnswer: string | null;
   responses: AssessmentResponse[];
