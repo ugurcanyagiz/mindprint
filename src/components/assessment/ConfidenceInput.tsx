@@ -10,9 +10,14 @@ export function ConfidenceInput({
   onChange,
 }: ConfidenceInputProps) {
   return (
-    <fieldset className="mt-10 border-t border-[var(--color-border)] pt-7">
+    <div className="mt-10 border-t border-[var(--color-border)] pt-7">
       <div className="flex items-center justify-between gap-6">
-        <legend className="text-sm font-medium">Confidence</legend>
+        <label
+          className="text-sm font-medium"
+          htmlFor="assessment-confidence"
+        >
+          Confidence
+        </label>
         <output
           className="text-sm tabular-nums text-[var(--color-muted)]"
           htmlFor="assessment-confidence"
@@ -40,6 +45,6 @@ export function ConfidenceInput({
         <span>Low</span>
         <span>High</span>
       </div>
-    </fieldset>
+    </div>
   );
 }

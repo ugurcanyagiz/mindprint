@@ -1,8 +1,10 @@
-import { assessmentBlueprints } from "../assessment/tasks";
-import { ConfidenceInput } from "../components/assessment/ConfidenceInput";
+import { useCallback } from "react";
+
+import { assessmentTasks } from "../assessment/tasks";
+import type { AdaptiveRuleTask, SingleChoiceTask } from "../assessment/types";
+import { AdaptiveTaskView } from "../components/assessment/AdaptiveTaskView";
 import { ProgressLine } from "../components/assessment/ProgressLine";
-import { ResponseArea } from "../components/assessment/ResponseArea";
-import { TaskFrame } from "../components/assessment/TaskFrame";
+import { SingleChoiceTaskView } from "../components/assessment/SingleChoiceTaskView";
 import { Button } from "../components/ui/Button";
 import { useAssessmentSession } from "../hooks/useAssessmentSession";
 
@@ -11,9 +13,24 @@ type AssessmentPageProps = {
 };
 
 export function AssessmentPage({ onExit }: AssessmentPageProps) {
-  const { session, begin, setConfidence, reset } = useAssessmentSession();
-  const totalTasks = assessmentBlueprints.length;
+  const totalTasks = assessmentTasks.length;
+  const {
+    session,
+    begin,
+    setConfidence,
+    setDraftAnswer,
+    saveAdaptivePhaseA,
+    moveToAdaptivePhaseB,
+    submitResponse,
+    reset,
+  } = useAssessmentSession(totalTasks);
+
+  const currentTask = assessmentTasks[session.currentTaskIndex];
   const taskNumber = Math.min(session.currentTaskIndex + 1, totalTasks);
+
+  const handleAdaptiveTransitionComplete = useCallback(() => {
+    moveToAdaptivePhaseB();
+  }, [moveToAdaptivePhaseB]);
 
   if (session.status === "not_started") {
     return (
@@ -49,11 +66,11 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
                 <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
                   Duration
                 </p>
-                <p className="mt-2 text-sm font-medium">~10 minutes</p>
+                <p className="mt-2 text-sm font-medium">~6 minutes</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                  Tasks
+                  Live tasks
                 </p>
                 <p className="mt-2 text-sm font-medium">{totalTasks}</p>
               </div>
@@ -76,6 +93,63 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
       </main>
     );
   }
+
+  if (session.status === "completed" || !currentTask) {
+    return (
+      <main className="min-h-screen">
+        <section className="mx-auto flex min-h-screen w-full max-w-[920px] items-center px-5 py-20 sm:px-8">
+          <div className="w-full max-w-[620px]">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-accent)]">
+              Assessment
+            </p>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
+              Assessment complete.
+            </h1>
+            <p className="mt-6 text-[17px] leading-7 text-[var(--color-muted)]">
+              Your responses have been saved on this device.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Button onClick={onExit}>Return to overview</Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  reset();
+                  window.requestAnimationFrame(begin);
+                }}
+              >
+                Start again
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const handleSingleChoiceSubmit = (task: SingleChoiceTask) => {
+    if (!session.draftAnswer) {
+      return;
+    }
+
+    submitResponse({
+      taskId: task.id,
+      answer: session.draftAnswer,
+      confidence: task.confidenceRequired ? session.confidence : undefined,
+    });
+  };
+
+  const handleAdaptiveSubmit = (
+    task: AdaptiveRuleTask,
+    phaseBAnswer: string,
+  ) => {
+    submitResponse({
+      taskId: task.id,
+      answer: {
+        phaseA: session.adaptivePhaseAAnswer,
+        phaseB: phaseBAnswer,
+      },
+    });
+  };
 
   return (
     <main className="min-h-screen">
@@ -103,24 +177,32 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
 
       <section className="mx-auto w-full max-w-[920px] px-5 pb-20 pt-16 sm:px-8 sm:pt-20">
         <div className="max-w-[720px]">
-          <TaskFrame
-            eyebrow="Assessment framework"
-            title="Task content enters in the next milestone."
-            description="This view establishes the focused task, response, confidence, and progression framework without introducing live assessment content."
-          >
-            <ResponseArea />
-            <ConfidenceInput
-              value={session.confidence}
-              onChange={setConfidence}
+          {currentTask.kind === "adaptive-rule" ? (
+            <AdaptiveTaskView
+              task={currentTask}
+              phase={session.adaptivePhase}
+              draftAnswer={session.draftAnswer}
+              onDraftChange={setDraftAnswer}
+              onSavePhaseA={saveAdaptivePhaseA}
+              onTransitionComplete={handleAdaptiveTransitionComplete}
+              onSubmit={(phaseBAnswer) =>
+                handleAdaptiveSubmit(currentTask, phaseBAnswer)
+              }
             />
+          ) : (
+            <SingleChoiceTaskView
+              task={currentTask}
+              answer={session.draftAnswer}
+              confidence={session.confidence}
+              onAnswerChange={setDraftAnswer}
+              onConfidenceChange={setConfidence}
+              onSubmit={() => handleSingleChoiceSubmit(currentTask)}
+            />
+          )}
 
-            <div className="mt-9 flex items-center justify-between gap-4">
-              <span className="text-xs text-[var(--color-muted)]">
-                Progress is saved on this device.
-              </span>
-              <Button disabled>Continue</Button>
-            </div>
-          </TaskFrame>
+          <p className="mt-10 text-xs text-[var(--color-muted)]">
+            Progress is saved on this device.
+          </p>
         </div>
       </section>
     </main>
