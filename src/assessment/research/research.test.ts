@@ -9,7 +9,6 @@ import { summarizeFairnessGroups } from "./fairness";
 import { syntheticResearchDataset } from "./fixtures/synthetic";
 import { analyzeResearchItem } from "./item-analysis";
 import { mean, pearsonCorrelation } from "./metrics";
-import { toResearchTaskRecord } from "./records";
 import {
   createItemReview,
   hasAutomaticFinalDecision,
@@ -17,7 +16,6 @@ import {
 } from "./selection";
 import { validateResearchTaskRecord } from "./validation";
 import { assessIrtReadiness } from "./validity";
-import type { ResearchTaskRecord } from "./types";
 
 function productionResponse(
   taskId: string,
