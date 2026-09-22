@@ -169,9 +169,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
     });
   };
 
-  const handleRankingSubmit = (task: RankingTask) => {
-    const answer = arrayDraft(session.draftAnswer);
-
+  const handleRankingSubmit = (task: RankingTask, answer: string[]) => {
     if (answer.length !== task.items.length) {
       return;
     }
@@ -242,7 +240,7 @@ export function AssessmentPage({ onExit }: AssessmentPageProps) {
               confidence={session.confidence}
               onAnswerChange={setDraftAnswer}
               onConfidenceChange={setConfidence}
-              onSubmit={() => handleRankingSubmit(currentTask)}
+              onSubmit={(answer) => handleRankingSubmit(currentTask, answer)}
             />
           ) : currentTask.kind === "adaptive-rule" ? (
             <AdaptiveTaskView

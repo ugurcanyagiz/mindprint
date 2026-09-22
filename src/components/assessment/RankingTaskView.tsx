@@ -9,10 +9,14 @@ type RankingTaskViewProps = {
   confidence: number;
   onAnswerChange: (value: string[]) => void;
   onConfidenceChange: (value: number) => void;
-  onSubmit: () => void;
+  onSubmit: (value: string[]) => void;
 };
 
-function moveItem(order: string[], index: number, direction: -1 | 1) {
+export function moveRankedItem(
+  order: string[],
+  index: number,
+  direction: -1 | 1,
+) {
   const nextIndex = index + direction;
 
   if (nextIndex < 0 || nextIndex >= order.length) {
@@ -37,7 +41,7 @@ export function RankingTaskView({
   const itemsById = new Map(task.items.map((item) => [item.id, item]));
 
   const reorder = (index: number, direction: -1 | 1) => {
-    onAnswerChange(moveItem(order, index, direction));
+    onAnswerChange(moveRankedItem(order, index, direction));
   };
 
   return (
@@ -55,7 +59,10 @@ export function RankingTaskView({
         {task.prompt}
       </p>
 
-      <ol className="border-y border-[var(--color-border)]">
+      <ol
+        className="border-y border-[var(--color-border)]"
+        aria-describedby="ranking-instructions"
+      >
         {order.map((id, index) => {
           const item = itemsById.get(id);
 
@@ -66,22 +73,22 @@ export function RankingTaskView({
           return (
             <li
               key={item.id}
-              className="grid min-h-[68px] grid-cols-[30px_1fr_auto] items-center gap-3 border-b border-[var(--color-border)] py-3.5 last:border-b-0"
+              className="grid min-h-[68px] grid-cols-[24px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-b border-[var(--color-border)] py-3.5 last:border-b-0 sm:grid-cols-[30px_minmax(0,1fr)_auto]"
             >
               <span className="text-[11px] tabular-nums text-[var(--color-muted-soft)]">
                 {String(index + 1).padStart(2, "0")}
               </span>
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-medium">{item.label}</p>
                 <p className="mt-0.5 text-xs leading-5 text-[var(--color-muted)]">
                   {item.detail}
                 </p>
               </div>
 
-              <div className="flex items-center gap-0.5">
+              <div className="col-start-2 flex items-center gap-0.5 sm:col-start-auto">
                 <button
-                  className="rounded-md px-2 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
+                  className="min-h-9 rounded-md px-2.5 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === 0}
                   aria-label={`Move ${item.label} up`}
@@ -90,7 +97,7 @@ export function RankingTaskView({
                   Up
                 </button>
                 <button
-                  className="rounded-md px-2 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
+                  className="min-h-9 rounded-md px-2.5 py-1.5 text-[11px] text-[var(--color-muted)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-25"
                   type="button"
                   disabled={index === order.length - 1}
                   aria-label={`Move ${item.label} down`}
@@ -104,16 +111,17 @@ export function RankingTaskView({
         })}
       </ol>
 
-      <p className="mt-2.5 text-[11px] text-[var(--color-muted)]">
-        1 = most influential
+      <p
+        id="ranking-instructions"
+        className="mt-2.5 text-[11px] text-[var(--color-muted)]"
+      >
+        1 = most influential. Use Up and Down to reorder.
       </p>
 
       <ConfidenceInput value={confidence} onChange={onConfidenceChange} />
 
       <div className="mt-8 flex justify-end">
-        <Button disabled={!answer} onClick={onSubmit}>
-          Continue
-        </Button>
+        <Button onClick={() => onSubmit(order)}>Continue</Button>
       </div>
     </TaskFrame>
   );
