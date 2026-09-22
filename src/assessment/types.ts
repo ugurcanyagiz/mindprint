@@ -26,3 +26,17 @@ export type AssessmentTask = {
   version: number;
   prompt: string;
 };
+
+export type AssessmentTaskBlueprint = {
+  id: string;
+  dimension: CognitiveDimension;
+  order: number;
+};
+
+export type AssessmentSession = {
+  status: "not_started" | "in_progress";
+  currentTaskIndex: number;
+  confidence: Confidence;
+  startedAt: string | null;
+  updatedAt: string;
+};

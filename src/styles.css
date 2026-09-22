@@ -46,6 +46,11 @@ select {
   font: inherit;
 }
 
+button,
+input[type="range"] {
+  touch-action: manipulation;
+}
+
 a {
   color: inherit;
 }
@@ -53,6 +58,51 @@ a {
 ::selection {
   background: #dbe5f4;
   color: var(--color-foreground);
+}
+
+.confidence-range {
+  height: 20px;
+  cursor: pointer;
+  appearance: none;
+  background: transparent;
+}
+
+.confidence-range::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.confidence-range::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -7px;
+  appearance: none;
+  border: 4px solid var(--color-background);
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.confidence-range::-moz-range-track {
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.confidence-range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 3px solid var(--color-background);
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.confidence-range:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 5px;
+  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {

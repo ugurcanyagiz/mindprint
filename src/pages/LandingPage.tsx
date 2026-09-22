@@ -9,7 +9,11 @@ const dimensions = [
   { index: "06", label: "Knowledge transfer" },
 ] as const;
 
-export function LandingPage() {
+type LandingPageProps = {
+  onBegin: () => void;
+};
+
+export function LandingPage({ onBegin }: LandingPageProps) {
   return (
     <main className="overflow-hidden">
       <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-6 sm:px-8 sm:py-8">
@@ -42,11 +46,7 @@ export function LandingPage() {
           </p>
 
           <div className="mt-10">
-            <Button
-              className="min-w-[168px] disabled:opacity-70"
-              disabled
-              title="Assessment flow will open in the next milestone."
-            >
+            <Button className="min-w-[168px]" onClick={onBegin}>
               Begin assessment
             </Button>
           </div>
