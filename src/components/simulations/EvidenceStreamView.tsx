@@ -1,10 +1,10 @@
-import {
-  evidenceStreamPrototype,
-} from "../../assessment/simulations/prototypes";
+import type { EvidencePrototype } from "../../assessment/simulations/types";
 import type { EvidenceState } from "../../assessment/simulations/session";
 import { Button } from "../ui/Button";
 
 type Props = {
+  prototype: EvidencePrototype;
+  formLabel: "A" | "B";
   state: EvidenceState;
   onDecision: (value: string) => void;
   onConfidence: (value: number) => void;
@@ -12,25 +12,26 @@ type Props = {
 };
 
 export function EvidenceStreamView({
+  prototype,
+  formLabel,
   state,
   onDecision,
   onConfidence,
   onSubmit,
 }: Props) {
-  const current = evidenceStreamPrototype.evidence[state.eventIndex];
-  const isLast =
-    state.eventIndex === evidenceStreamPrototype.evidence.length - 1;
+  const current = prototype.evidence[state.eventIndex];
+  const isLast = state.eventIndex === prototype.evidence.length - 1;
 
   return (
     <div>
       <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-accent)]">
-        Prototype 03 · Dynamic Evidence Stream
+        Dynamic Evidence Stream · Form {formLabel}
       </p>
       <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.045em] sm:text-[42px]">
-        {evidenceStreamPrototype.title}
+        {prototype.title}
       </h1>
       <p className="mt-4 max-w-[650px] text-sm leading-6 text-[var(--color-muted)]">
-        {evidenceStreamPrototype.description}
+        {prototype.description}
       </p>
 
       <div className="mt-8 border-y border-[var(--color-border)] py-5">
@@ -38,7 +39,7 @@ export function EvidenceStreamView({
           Hypothesis
         </p>
         <p className="mt-2 text-[17px] font-medium leading-7">
-          {evidenceStreamPrototype.hypothesis}
+          {prototype.hypothesis}
         </p>
       </div>
 
@@ -49,7 +50,7 @@ export function EvidenceStreamView({
           </p>
           <div className="mt-2 border-t border-[var(--color-border)]">
             {state.checkpoints.map((checkpoint, index) => {
-              const item = evidenceStreamPrototype.evidence[index];
+              const item = prototype.evidence[index];
               return (
                 <div
                   key={checkpoint.evidenceId}
@@ -68,10 +69,7 @@ export function EvidenceStreamView({
         </div>
       ) : null}
 
-      <div
-        className="mt-6 border-l border-[var(--color-accent)] pl-4"
-        aria-live="polite"
-      >
+      <div className="mt-6 border-l border-[var(--color-accent)] pl-4" aria-live="polite">
         <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
           {current.event.label} · {current.source}
         </p>
@@ -85,7 +83,7 @@ export function EvidenceStreamView({
           Update your current judgment
         </legend>
         <div className="mt-3 border-y border-[var(--color-border)]">
-          {evidenceStreamPrototype.responseOptions.map((option) => (
+          {prototype.responseOptions.map((option) => (
             <label
               key={option.id}
               className="flex cursor-pointer items-center gap-3 border-b border-[var(--color-border)] py-3 last:border-b-0"

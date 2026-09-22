@@ -1,10 +1,10 @@
-import {
-  dynamicAttentionPrototype,
-} from "../../assessment/simulations/prototypes";
+import type { AttentionPrototype } from "../../assessment/simulations/types";
 import type { AttentionState } from "../../assessment/simulations/session";
 import { Button } from "../ui/Button";
 
 type Props = {
+  prototype: AttentionPrototype;
+  formLabel: "A" | "B";
   state: AttentionState;
   onToggle: (signalId: string) => void;
   onAdvance: () => void;
@@ -13,26 +13,27 @@ type Props = {
 };
 
 export function DynamicAttentionView({
+  prototype,
+  formLabel,
   state,
   onToggle,
   onAdvance,
   onConfidence,
   onComplete,
 }: Props) {
-  const frame = dynamicAttentionPrototype.frames[state.frameIndex];
-  const isFinal =
-    state.frameIndex === dynamicAttentionPrototype.frames.length - 1;
+  const frame = prototype.frames[state.frameIndex];
+  const isFinal = state.frameIndex === prototype.frames.length - 1;
 
   return (
     <div>
       <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-accent)]">
-        Prototype 01 · Dynamic Attention Field
+        Dynamic Attention Field · Form {formLabel}
       </p>
       <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.045em] sm:text-[42px]">
-        {dynamicAttentionPrototype.title}
+        {prototype.title}
       </h1>
       <p className="mt-4 max-w-[650px] text-sm leading-6 text-[var(--color-muted)]">
-        {dynamicAttentionPrototype.description}
+        {prototype.description}
       </p>
 
       <div className="mt-8 flex items-center justify-between border-y border-[var(--color-border)] py-3">
@@ -40,7 +41,7 @@ export function DynamicAttentionView({
           {frame.event.label}
         </span>
         <span className="text-[11px] tabular-nums text-[var(--color-muted)]">
-          {state.frameIndex + 1} / {dynamicAttentionPrototype.frames.length}
+          {state.frameIndex + 1} / {prototype.frames.length}
         </span>
       </div>
 
@@ -55,7 +56,7 @@ export function DynamicAttentionView({
       ) : null}
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        {dynamicAttentionPrototype.signals.map((signal) => {
+        {prototype.signals.map((signal) => {
           const value = frame.values[signal.id] ?? 0;
           const selected = state.selectedSignalIds.includes(signal.id);
 
@@ -89,7 +90,8 @@ export function DynamicAttentionView({
       </div>
 
       <p className="mt-3 text-[11px] text-[var(--color-muted)]">
-        Select the two signals you currently consider most diagnostic. You can revise them as the field changes.
+        Select the two signals you currently consider most diagnostic. You can
+        revise them as the field changes.
       </p>
 
       {isFinal ? (
@@ -115,8 +117,7 @@ export function DynamicAttentionView({
           <div className="mt-7 flex justify-end">
             <Button
               disabled={
-                state.selectedSignalIds.length !==
-                dynamicAttentionPrototype.selectionLimit
+                state.selectedSignalIds.length !== prototype.selectionLimit
               }
               onClick={onComplete}
             >

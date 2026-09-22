@@ -1,5 +1,14 @@
+import {
+  attentionForm,
+  attentionPrototype,
+  evidenceForm,
+  evidencePrototype,
+  hiddenPrototype,
+  hiddenSystemForm,
+} from "../assessment/simulations/session";
 import { simulationPrototypes } from "../assessment/simulations/prototypes";
 import { buildPrototypeDiagnostics } from "../assessment/simulations/diagnostics";
+import { serializeSimulationResearchExport } from "../assessment/simulations/validation/export";
 import { DynamicAttentionView } from "../components/simulations/DynamicAttentionView";
 import { EvidenceStreamView } from "../components/simulations/EvidenceStreamView";
 import { HiddenSystemView } from "../components/simulations/HiddenSystemView";
@@ -9,6 +18,19 @@ import { useSimulationSession } from "../hooks/useSimulationSession";
 type Props = {
   onExit: () => void;
 };
+
+function exportResearchJson(
+  filename: string,
+  content: string,
+) {
+  const blob = new Blob([content], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
 export function SimulationsPage({ onExit }: Props) {
   const controls = useSimulationSession();
@@ -39,9 +61,9 @@ export function SimulationsPage({ onExit }: Props) {
               Cognitive simulations
             </h1>
             <p className="mt-5 text-[16px] leading-7 text-[var(--color-muted)]">
-              Three research prototypes observe decisions across changing
-              information, feedback, and evidence. They do not produce an IQ,
-              percentile, diagnosis, or validated cognitive score.
+              Three controlled research environments record behavioral traces
+              across changing information, feedback, and evidence. Parallel-form
+              candidates are assigned deterministically for this local session.
             </p>
 
             <div className="mt-9 grid border-y border-[var(--color-border)] sm:grid-cols-3">
@@ -59,9 +81,9 @@ export function SimulationsPage({ onExit }: Props) {
             </div>
 
             <p className="mt-5 text-xs leading-5 text-[var(--color-muted)]">
-              Step mode is used so the same event structure can remain
-              accessible and auditable. Visual transitions respect reduced-motion
-              preferences.
+              Step mode is used for accessibility and auditability. This research
+              form does not generate an IQ, percentile, diagnosis, or validated
+              cognitive score.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -90,18 +112,24 @@ export function SimulationsPage({ onExit }: Props) {
               Simulation set complete
             </h1>
             <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-              {session.traces.length} behavioral trace records were stored
-              locally across {diagnostics.length} prototypes. No score or
-              interpretation is generated.
+              {diagnostics.length} prototypes completed · {session.traces.length}{" "}
+              behavioral traces stored locally · research export available.
+              No score or interpretation is generated.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button onClick={onExit}>Return to MINDPRINT</Button>
               <Button
                 variant="secondary"
-                onClick={() => {
-                  controls.reset();
-                }}
+                onClick={() =>
+                  exportResearchJson(
+                    `mindprint-${session.researchSessionId}.json`,
+                    serializeSimulationResearchExport(session),
+                  )
+                }
               >
+                Export research JSON
+              </Button>
+              <Button variant="secondary" onClick={controls.reset}>
                 Reset research session
               </Button>
             </div>
@@ -111,7 +139,7 @@ export function SimulationsPage({ onExit }: Props) {
     );
   }
 
-  const prototype = simulationPrototypes[session.currentPrototypeIndex];
+  const index = session.currentPrototypeIndex;
 
   return (
     <main className="min-h-screen">
@@ -122,7 +150,7 @@ export function SimulationsPage({ onExit }: Props) {
           </span>
           <div className="flex items-center gap-4">
             <span className="text-[10px] tabular-nums text-[var(--color-muted)]">
-              {session.currentPrototypeIndex + 1} / {simulationPrototypes.length}
+              {index + 1} / 3
             </span>
             <button
               type="button"
@@ -137,23 +165,30 @@ export function SimulationsPage({ onExit }: Props) {
 
       <section className="mx-auto w-full max-w-[900px] px-5 pb-20 pt-12 sm:px-8 sm:pt-16">
         <div className="max-w-[700px]">
-          {prototype.kind === "attention" ? (
+          {index === 0 ? (
             <DynamicAttentionView
+              prototype={attentionPrototype(session)}
+              formLabel={attentionForm(session).formLabel}
               state={session.attention}
               onToggle={controls.toggleAttentionSignal}
               onAdvance={controls.advanceAttention}
               onConfidence={controls.setAttentionConfidence}
               onComplete={controls.completeAttention}
             />
-          ) : prototype.kind === "hidden-system" ? (
+          ) : index === 1 ? (
             <HiddenSystemView
+              prototype={hiddenPrototype(session)}
+              formLabel={hiddenSystemForm(session).formLabel}
               state={session.hiddenSystem}
               onDraft={controls.setHiddenDraft}
+              onHypothesis={controls.setHiddenHypothesis}
               onConfidence={controls.setHiddenConfidence}
               onSubmit={controls.submitHidden}
             />
           ) : (
             <EvidenceStreamView
+              prototype={evidencePrototype(session)}
+              formLabel={evidenceForm(session).formLabel}
               state={session.evidence}
               onDecision={controls.setEvidenceDecision}
               onConfidence={controls.setEvidenceConfidence}

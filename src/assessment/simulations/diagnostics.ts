@@ -1,9 +1,9 @@
 import {
-  dynamicAttentionPrototype,
-  evidenceStreamPrototype,
-  hiddenSystemPrototype,
-} from "./prototypes";
-import type { SimulationResearchSession } from "./session";
+  attentionForm,
+  evidenceForm,
+  hiddenSystemForm,
+  type SimulationResearchSession,
+} from "./session";
 import type { SimulationDiagnostic, TraceSummary } from "./types";
 
 function ratio(numerator: number, denominator: number) {
@@ -16,9 +16,7 @@ export function summarizeSimulationTraces(
   const outcomeTraces = session.traces.filter(
     (trace) => trace.category === "outcome",
   );
-  const decisions = outcomeTraces.filter(
-    (trace) => trace.type === "decision",
-  );
+  const decisions = outcomeTraces.filter((trace) => trace.type === "decision");
   const correctDecisions = decisions.filter(
     (trace) => trace.payload.correct === true,
   ).length;
@@ -34,10 +32,11 @@ export function summarizeSimulationTraces(
       trace.payload.value >= 80 &&
       trace.payload.correct === false,
   ).length;
+
+  const hiddenId = hiddenSystemForm(session).id;
   const hiddenPredictions = session.traces.filter(
     (trace) =>
-      trace.prototypeId === hiddenSystemPrototype.id &&
-      trace.type === "rule-prediction",
+      trace.payload.formId === hiddenId && trace.type === "rule-prediction",
   );
   const postChange = hiddenPredictions.filter(
     (trace) => trace.payload.phase === "changed-b",
@@ -46,18 +45,19 @@ export function summarizeSimulationTraces(
     (trace) => trace.payload.correct === false,
   ).length;
 
+  const attn = attentionForm(session);
   const selected = session.attention.selectedSignalIds;
-  const correctSelections =
-    dynamicAttentionPrototype.diagnosticSignalIds.filter((id) =>
-      selected.includes(id),
-    ).length;
+  const diagnosticIds =
+    attn.prototype.kind === "attention"
+      ? attn.prototype.diagnosticSignalIds
+      : [];
+  const correctSelections = diagnosticIds.filter((id) =>
+    selected.includes(id),
+  ).length;
 
   return {
     correctOutcomeRate: ratio(correctDecisions, decisions.length),
-    selectionQuality: ratio(
-      correctSelections,
-      dynamicAttentionPrototype.diagnosticSignalIds.length,
-    ),
+    selectionQuality: ratio(correctSelections, diagnosticIds.length),
     meanConfidence:
       confidenceValues.length > 0
         ? confidenceValues.reduce((sum, value) => sum + value, 0) /
@@ -77,71 +77,31 @@ export function summarizeSimulationTraces(
 export function buildPrototypeDiagnostics(
   session: SimulationResearchSession,
 ): SimulationDiagnostic[] {
-  const attentionCorrect =
-    dynamicAttentionPrototype.diagnosticSignalIds.every((id) =>
-      session.attention.selectedSignalIds.includes(id),
-    ) &&
-    session.attention.selectedSignalIds.length ===
-      dynamicAttentionPrototype.diagnosticSignalIds.length;
+  const attn = attentionForm(session);
+  const hidden = hiddenSystemForm(session);
+  const evidence = evidenceForm(session);
 
-  const hiddenCorrect = session.hiddenSystem.predictions.filter(
-    (prediction) => prediction.correct,
-  ).length;
-  const evidenceChanges = session.evidence.checkpoints.filter(
-    (checkpoint, index, all) =>
-      index > 0 && checkpoint.decision !== all[index - 1].decision,
-  ).length;
-
-  return [
-    {
-      prototypeId: dynamicAttentionPrototype.id,
+  return [attn, hidden, evidence].map((form) => {
+    const relevant = session.traces.filter(
+      (trace) => trace.payload.formId === form.id,
+    );
+    return {
+      prototypeId: form.prototype.id,
       traceSummary: {
-        traceCount: session.traces.filter(
-          (trace) => trace.prototypeId === dynamicAttentionPrototype.id,
-        ).length,
+        formId: form.id,
+        traceCount: relevant.length,
       },
       outcomeSignals: {
-        diagnosticSelectionCorrect: session.attention.completed
-          ? attentionCorrect
-          : null,
+        completed:
+          form.environmentId === "dynamic-attention"
+            ? session.attention.completed
+            : form.environmentId === "hidden-system-learning"
+              ? session.hiddenSystem.completed
+              : session.evidence.completed,
       },
       processSignals: {
-        selectionChanges: session.attention.selectionSequence.length,
-        confidence: session.attention.completed
-          ? session.attention.confidence
-          : null,
+        formLabel: form.formLabel,
       },
-    },
-    {
-      prototypeId: hiddenSystemPrototype.id,
-      traceSummary: {
-        traceCount: session.traces.filter(
-          (trace) => trace.prototypeId === hiddenSystemPrototype.id,
-        ).length,
-      },
-      outcomeSignals: {
-        correctPredictions: hiddenCorrect,
-        totalPredictions: session.hiddenSystem.predictions.length,
-      },
-      processSignals: {
-        changeDetectedAtTrial: session.hiddenSystem.changeDetectedAtTrial,
-      },
-    },
-    {
-      prototypeId: evidenceStreamPrototype.id,
-      traceSummary: {
-        traceCount: session.traces.filter(
-          (trace) => trace.prototypeId === evidenceStreamPrototype.id,
-        ).length,
-      },
-      outcomeSignals: {
-        finalJudgment:
-          session.evidence.checkpoints.at(-1)?.decision ?? null,
-      },
-      processSignals: {
-        judgmentChanges: evidenceChanges,
-        checkpointCount: session.evidence.checkpoints.length,
-      },
-    },
-  ];
+    };
+  });
 }

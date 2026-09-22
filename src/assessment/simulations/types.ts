@@ -169,8 +169,9 @@ export type HiddenSystemTrial = {
   id: string;
   input: number;
   expected: number;
-  phase: "stable-a" | "changed-b" | "transfer";
+  phase: "stable-a" | "anomaly" | "changed-b" | "transfer";
   feedbackAfterSubmission: boolean;
+  hypothesisCheckpoint?: boolean;
 };
 
 export type HiddenSystemPrototype = {
@@ -191,6 +192,11 @@ export type EvidenceEvent = {
   evidence: string;
   evidentialDirection: "supports" | "contradicts" | "mixed";
   evidentialWeight: "weak" | "moderate" | "strong";
+  independence: string;
+  studyQuality: string;
+  sampleInformation: string;
+  conflictOfInterest: string;
+  diagnosticWeight: number;
 };
 
 export type EvidencePrototype = {
