@@ -4,10 +4,19 @@ import { AppShell } from "./components/layout/AppShell";
 import { AssessmentPage } from "./pages/AssessmentPage";
 import { ExperimentalPage } from "./pages/ExperimentalPage";
 import { LandingPage } from "./pages/LandingPage";
+import { SimulationsPage } from "./pages/SimulationsPage";
 
-type AppRoute = "landing" | "assessment" | "experimental";
+type AppRoute =
+  | "landing"
+  | "assessment"
+  | "experimental"
+  | "simulations";
 
 function getRouteFromHash(): AppRoute {
+  if (window.location.hash.startsWith("#simulations")) {
+    return "simulations";
+  }
+
   if (window.location.hash.startsWith("#experimental")) {
     return "experimental";
   }
@@ -33,7 +42,9 @@ export function App() {
         ? "assessment"
         : nextRoute === "experimental"
           ? "experimental"
-          : "";
+          : nextRoute === "simulations"
+            ? "simulations"
+            : "";
   };
 
   return (
@@ -42,6 +53,8 @@ export function App() {
         <AssessmentPage onExit={() => navigate("landing")} />
       ) : route === "experimental" ? (
         <ExperimentalPage onExit={() => navigate("landing")} />
+      ) : route === "simulations" ? (
+        <SimulationsPage onExit={() => navigate("landing")} />
       ) : (
         <LandingPage onBegin={() => navigate("assessment")} />
       )}
